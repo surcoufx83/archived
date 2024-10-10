@@ -4,3 +4,7 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
+config = "0.14.0"
+mysql = "25.0.1"
+serde = "1.0.210"
+toml = "0.8.19"
