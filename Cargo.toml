@@ -6,5 +6,5 @@ edition = "2021"
 [dependencies]
 config = "0.14.0"
 mysql = "25.0.1"
-serde = "1.0.210"
+serde = { version = "1.0.210", features = ["derive"] }
 toml = "0.8.19"

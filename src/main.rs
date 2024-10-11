@@ -1,34 +1,34 @@
 use mysql::*;
 use mysql::prelude::*;
-use config::Config;
-use toml::Table;
-use std::fs;
+use std::error::Error;
 
-// Struct to hold the database configuration
-/* #[derive(Deserialize)]
-struct DatabaseConfig {
-    user: String,
-    password: String,
-    host: String,
-    port: u16,
-    database_name: String,
-} */
+// Import the config module
+mod app;
+use app::config::{load_config};
+
 
 fn main() -> std::result::Result<(), Box<dyn std::error::Error>> {
     
-    let path = "config.toml";
-    match fs::metadata(path) {
-        Ok(_) => println!("File exists!"),
-        Err(_) => println!("File not found!"),
-    }
+    // Load the configuration
+    let config = load_config().map_err(|e| {
+        eprintln!("Error loading configuration: {}", e);
+        Box::<dyn Error>::from(e)
+    })?;
 
-    /* let config = load_database_config()?;
+    // Extract database configuration
+    let db = config.database;
 
-    let cstring = format!(
-        "mysql://{}:{}@{}:{}/{}",
-        config.user, config.password, config.host, config.port, config.database_name
-    );
-    let pool = Pool::new(cstring)?;
+    // Create the database URL
+    let connection_parms = OptsBuilder::new()
+        .ip_or_hostname(Some(db.host))
+        .tcp_port(db.port)
+        .user(Some(db.user))
+        .pass(Some(db.password))
+        .db_name(Some(db.database_name));
+    println!("{:?}", connection_parms);
+    // Establish a connection pool
+    let pool = Pool::new(connection_parms)?;
+
     let mut connection = pool.get_conn()?;
 
     let query = "SELECT * FROM files LIMIT 100";
@@ -38,7 +38,7 @@ fn main() -> std::result::Result<(), Box<dyn std::error::Error>> {
     for row in results {
         println!("{:?}", row);
     }
- */
+ 
     Ok(())
 
 }
